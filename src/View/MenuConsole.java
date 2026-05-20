@@ -3,6 +3,7 @@ package View;
 import Controller.*;
 import Model.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.InputMismatchException;
@@ -16,14 +17,19 @@ public class MenuConsole {
         this.scanner = new Scanner(System.in);
     }
 
-    public void iniciar(){
-        int opcao = -1;
+    private List<Funcionario> funcionariosCadastrados = new ArrayList<>();
+    private List<Cliente> clientesCadastrados = new ArrayList<>();
 
+    public void iniciar() {
+        popularDadosIniciais();
+
+        int opcao = -1;
         while (opcao != 0) {
             try {
-                System.out.println("\n========== SISTEMA DE LOGÍSTICA ==========");
-                System.out.println("1. Registrar Nova Entrega");
-                System.out.println("2. Listar Entregas Registradas");
+                System.out.println("\n========== SISTEMA DE LOGÍSTICA MULTI-MENU ==========");
+                System.out.println("1. Menu do Cliente ");
+                System.out.println("2. Menu do Funcionário");
+                System.out.println("3. Menu Administrativo");
                 System.out.println("0. Sair");
                 System.out.print("Escolha uma opção: ");
 
@@ -32,34 +38,102 @@ public class MenuConsole {
 
                 switch (opcao) {
                     case 1:
-                        menuRegistrarEntrega();
+                        menuCliente();
                         break;
                     case 2:
-                        menuListarEntregas();
+                        menuFuncionario();
+                        break;
+                    case 3:
+                        menuAdm();
                         break;
                     case 0:
-                        System.out.println("Saindo do sistema... Até logo!");
+                        System.out.println("Saindo...");
                         break;
                     default:
-                        System.out.println("Opção inválida! Tente novamente.");
+                        System.out.println("Opção inválida!");
                 }
             } catch (InputMismatchException e) {
-                System.out.println("Erro: Por favor, digite um número inteiro válido!");
+                System.out.println("Erro: Digite um número inteiro!");
                 scanner.nextLine();
             }
         }
     }
+    // =========================================================
+    // SUB-MENU 1: CLIENTE
+    // =========================================================
+    private void menuCliente() {
+        int opcao = -1;
+        while (opcao != 0) {
+            System.out.println("\n--- MENU DO CLIENTE ---");
+            System.out.println("1. Solicitar Nova Entrega (Fazer Pedido)");
+            System.out.println("0. Voltar ao Menu Principal");
+            System.out.print("Escolha uma opção: ");
+            try {
+                opcao = scanner.nextInt();
+                scanner.nextLine();
 
-    private void menuRegistrarEntrega() {
-        System.out.println("\n--- REGISTAR NOVA ENTREGA ---");
+                if (opcao == 1) {
+                    fluxoSolicitarEntrega();
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Digite um número válido.");
+                scanner.nextLine();
+            }
+        }
+    }
+    // =========================================================
+    // SUB-MENU 2: FUNCIONÁRIO
+    // =========================================================
+    private void menuFuncionario() {
+        int opcao = -1;
+        while (opcao != 0) {
+            System.out.println("\n--- MENU DO FUNCIONÁRIO ---");
+            System.out.println("1. Cadastrar Novo Entregador e Veículo");
+            System.out.println("2. Listar Entregadores na Frota");
+            System.out.println("0. Voltar ao Menu Principal");
+            System.out.print("Escolha uma opção: ");
+            try {
+                opcao = scanner.nextInt();
+                scanner.nextLine();
 
-        // 1. Dados do Destinatário (Cliente) e o seu Local
-        System.out.println("\n[Dados do Destinatário]");
-        String nomeCliente = lerTextoObrigatorio("Nome do Cliente: ");
-        String cpfCliente = lerCpfValido("CPF do Cliente: ");
+                switch (opcao) {
+                    case 1:
+                        fluxoCadastrarFuncionario();
+                        break;
+                    case 2:
+                        listarFrota();
+                        break;
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Digite um número válido.");
+                scanner.nextLine();
+            }
+        }
+    }
+    // =========================================================
+    // SUB-MENU 2: ADMINISTRADOR
+    // =========================================================
+    private void menuAdm() {
+        System.out.println("\n--- SISTEMA ADMINISTRATIVO - TODAS AS ENTREGAS ---");
+        List<Entrega> lista = controller.listarTodasEntregas();
+        if (lista.isEmpty()) {
+            System.out.println("Nenhuma entrega solicitada no sistema até agora.");
+            return;
+        }
+        for (Entrega e : lista) {
+            System.out.println(e.toString());
+            System.out.println("--------------------------------------------------");
+        }
+    }
+    // =========================================================
+    // LÓGICA DE SOLICITAÇÃO DE ENTREGA
+    // =========================================================
+    private void fluxoSolicitarEntrega() {
+        System.out.println("\n[Nova Solicitação de Entrega]");
 
-        System.out.println("[Endereço de Entrega]");
-        String rua = lerTextoObrigatorio("Rua: ");
+        String nomeCliente = lerTextoObrigatorio("Seu Nome: ");
+        String cpfCliente = lerCpfValido("Seu CPF: ");
+        String rua = lerTextoObrigatorio("Rua de entrega: ");
         String numero = lerTextoObrigatorio("Número: ");
         String bairro = lerTextoObrigatorio("Bairro: ");
         String cep = lerCepValido("CEP: ");
@@ -67,19 +141,8 @@ public class MenuConsole {
         Local endereco = new Local(rua, numero, bairro, cep);
         Cliente cliente = new Cliente(nomeCliente, cpfCliente, endereco);
 
-        // 2. Dados do Entregador (Funcionário) e o seu Veículo
-        System.out.println("\n[Dados do entregador]");
-        String nomeFunc = lerTextoObrigatorio("Nome do Funcionário: ");
-        String cpfFunc = lerCpfValido("Cpf do Funcionário: ");
-
-        System.out.println("\n[Dados Gerais do Veículo]");
-        String placa = lerPlacaValida("Placa (7 caracteres): ");
-        String cor = lerTextoObrigatorio("Cor: ");
-
-        // 3. Dados da Encomenda
-        System.out.println("\n[Dados da Encomenda]");
-        String nomeEnc = lerTextoObrigatorio("Nome/Título (ex: Caixa de Livros): ");
-        String descEnc = lerTextoObrigatorio("Descrição: ");
+        String nomeEnc = lerTextoObrigatorio("O que está enviando? (ex: Celular): ");
+        String descEnc = lerTextoObrigatorio("Descrição do produto: ");
         String tamanhoEnc = lerTextoObrigatorio("Tamanho (P/M/G): ");
 
         double pesoEnc = 0;
@@ -94,57 +157,140 @@ public class MenuConsole {
 
                 encomenda = new Encomenda(nomeEnc, descEnc, pesoEnc, tamanhoEnc, cliente);
                 pesoValido = true;
-
             } catch (InputMismatchException e) {
-                System.out.println("Erro: Por favor, digite um número válido para o peso!");
+                System.out.println("Digite um número válido para o peso.");
                 scanner.nextLine();
             } catch (IllegalArgumentException e) {
-                System.out.println("Erro de Validação: " + e.getMessage());
+                System.out.println(e.getMessage());
             }
         }
-        String nomeTipo = "";
 
-        if (pesoEnc < 50.0) {
-            nomeTipo = "Moto";
-        } else if (pesoEnc >= 50.0 && pesoEnc < 150.0) {
-            nomeTipo = "Carro";
-        } else {
-            nomeTipo = "Caminhão";
+        List<Funcionario> filtrados = filtrarFuncionariosPorPeso(pesoEnc);
+
+        if (filtrados.isEmpty()) {
+            System.out.println("\nDesculpe! Não temos nenhum veículo disponível na frota cadastrado para suportar o peso de " + pesoEnc + "kg no momento.");
+            return;
         }
 
-        TipoVeiculo veiculo = new TipoVeiculo(nomeTipo, pesoEnc, placa, cor);
-        Funcionario funcionario = new Funcionario(nomeFunc, cpfFunc, veiculo);
+        System.out.println("\nSelecione um dos entregadores disponíveis para a sua carga:");
+        for (int i = 0; i < filtrados.size(); i++) {
+            System.out.println((i + 1) + " - " + filtrados.get(i).getNome() + " [Veículo: " + filtrados.get(i).getVeiculo().getTipo() + "]");
+        }
 
-        // 4. Modalidade de Frete
+        boolean escolhaValida = false;
+        int escolhaFunc = -1;
+
+        while(!escolhaValida) {
+            try {
+                System.out.print("Escolha o entregador pelo número: ");
+                escolhaFunc = scanner.nextInt() - 1;
+                scanner.nextLine();
+                if (escolhaFunc < 0 || escolhaFunc >= filtrados.size()) {
+                    System.out.println("Escolha inválida");
+                } else {
+                    escolhaValida = true;
+                }
+            } catch (InputMismatchException e){
+                System.out.println("Digite um número válido para o entregador.");
+                scanner.nextLine();
+            }
+        }
+
+        Funcionario funcionarioEscolhido = filtrados.get(escolhaFunc);
+
         System.out.println("\n[Modalidade de Frete]");
         System.out.println("1 - Frete Padrão");
         System.out.println("2 - Frete Expresso");
-        System.out.print("Escolha a opção: ");
+        System.out.print("Escolha: ");
         int opcaoFrete = scanner.nextInt();
         scanner.nextLine();
 
         ModalidadeFrete frete = (opcaoFrete == 2) ? new FreteExpresso() : new FretePadrao();
 
-        // 5. Salvar através do Controller
-        Entrega novaEntrega = new Entrega(funcionario, encomenda, frete);
+        Entrega novaEntrega = new Entrega(funcionarioEscolhido, encomenda, frete);
         controller.adicionarEntrega(novaEntrega);
 
-        System.out.println("\nEntrega registada com sucesso!");
-        System.out.println("Valor calculado do frete: R$ " + novaEntrega.calcularTotalFrete());
+        System.out.println("\nPedido de entrega realizado com sucesso!");
+        System.out.println("Entregador Designado: " + funcionarioEscolhido.getNome() + " operando um(a) " + funcionarioEscolhido.getVeiculo().getTipo());
+        System.out.println("Valor do Frete: R$ " + String.format("%.2f", novaEntrega.calcularTotalFrete()));
     }
 
-    private void menuListarEntregas() {
-        System.out.println("\n--- LISTA DE ENTREGAS REGISTADAS ---");
+    private List<Funcionario> filtrarFuncionariosPorPeso(double peso) {
+        List<Funcionario> motos = new ArrayList<>();
+        List<Funcionario> carros = new ArrayList<>();
+        List<Funcionario> caminhoes = new ArrayList<>();
+        for (Funcionario f : funcionariosCadastrados) {
+            String tipo = f.getVeiculo().getTipo();
+            if (tipo.equalsIgnoreCase("Moto")) motos.add(f);
+            else if (tipo.equalsIgnoreCase("Carro")) carros.add(f);
+            else if (tipo.equalsIgnoreCase("Caminhão")) caminhoes.add(f);
+        }
 
-        List<Entrega> lista = controller.listarTodasEntregas();
-        if (lista.isEmpty()) {
-            System.out.println("Nenhuma entrega foi registada até ao momento.");
+        if (peso < 50.0) {
+            if (!motos.isEmpty()) return motos;
+            if (!carros.isEmpty()) return carros;
+            return caminhoes;
+        }
+        else if (peso >= 50.0 && peso < 150.0) {
+            if (!carros.isEmpty()) return carros;
+            return caminhoes;
+        }
+        else {
+            return caminhoes;
+        }
+    }
+    // =========================================================
+    // CADASTROS COMPLEMENTARES
+    // =========================================================
+    private void fluxoCadastrarFuncionario() {
+        System.out.println("\n[Cadastro de Funcionário]");
+        String nome = lerTextoObrigatorio("Nome do Funcionário: ");
+        String cpf = lerCpfValido("CPF: ");
+
+        System.out.println("Selecione o Tipo de Veículo dele:");
+        System.out.println("1 - Moto (Até 50kg)");
+        System.out.println("2 - Carro (Até 150kg)");
+        System.out.println("3 - Caminhão (Cargas Pesadas)");
+        System.out.print("Opção: ");
+        int op = scanner.nextInt();
+        scanner.nextLine();
+
+        String tipo = "Moto";
+        if (op == 2) tipo = "Carro";
+        if (op == 3) tipo = "Caminhão";
+
+        String placa = lerPlacaValida("Placa: ");
+        String cor = lerTextoObrigatorio("Cor: ");
+
+        TipoVeiculo veiculo = new TipoVeiculo(tipo, pesoDoTipo(tipo), placa, cor);
+        Funcionario f = new Funcionario(nome, cpf, veiculo);
+
+        funcionariosCadastrados.add(f);
+        System.out.println("Funcionário e veículo cadastrados na frota com sucesso!");
+    }
+
+    private double pesoDoTipo(String tipo) {
+        if(tipo.equals("Moto")) return 50.0;
+        if(tipo.equals("Carro")) return 150.0;
+        return 2000.0;
+    }
+
+    private void listarFrota() {
+        System.out.println("\n--- ENTREGADORES CADASTRADOS ---");
+        if (funcionariosCadastrados.isEmpty()) {
+            System.out.println("Nenhum entregador na frota.");
             return;
         }
-        for (Entrega e : lista) {
-            System.out.println(e.toString());
-            System.out.println("--------------------------------------------------");
+        for (Funcionario f : funcionariosCadastrados) {
+            System.out.println(f.toString());
         }
+    }
+
+
+    private void popularDadosIniciais() {
+        funcionariosCadastrados.add(new Funcionario("Luiz Motoboy", "11111111111", new TipoVeiculo("Moto", 50.0, "MOT1111", "Preta")));
+        funcionariosCadastrados.add(new Funcionario("Otavio Carro", "22222222222", new TipoVeiculo("Carro", 150.0, "CAR2222", "Branco")));
+        funcionariosCadastrados.add(new Funcionario("Lucas Caminhão", "33333333333", new TipoVeiculo("Caminhão", 2000.0, "CAM3333", "Azul")));
     }
 
     private String lerTextoObrigatorio(String mensagem) {
