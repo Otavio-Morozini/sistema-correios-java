@@ -4,9 +4,7 @@ Este é um sistema desenvolvido em Java que simula o funcionamento básico de um
 
 ## 🚀 Funcionalidades Principais
 * **Cadastro de Encomendas:** Registro de pacotes com peso, dimensões e destinatário.
-* **Cálculo de Frete e Prazos:** Lógica para cálculo do valor do envio com base na distância e peso da mercadoria.
-* **Rastreamento em Tempo Real:** Atualização e consulta do status de entrega da encomenda (Postado, Em Trânsito, Entregue).
-* **Gerenciamento de Rotas/Centros de Distribuição:** Simulação do fluxo de logística entre agências.
+* **Cálculo de Frete e Prazos:** Lógica para cálculo do valor do envio com base no peso da mercadoria.
 
 ## 🛠️ Tecnologias Utilizadas
 * **Linguagem:** Java 26
@@ -15,8 +13,7 @@ Este é um sistema desenvolvido em Java que simula o funcionamento básico de um
 ## 🧩 Conceitos de Engenharia de Software Aplicados
 Para garantir uma boa arquitetura e código limpo, apliquei conceitos fundamentais de desenvolvimento:
 * **Abstração e Encapsulamento:** Proteção dos atributos sensíveis das encomendas e clientes.
-* **Herança e Polimorfismo:** Criação de diferentes tipos de envios (ex: Sedex, PAC) herdando de uma classe base de entrega.
-* **Padrões de Projeto (Design Patterns):** *(Opcional - caso tenha usado algum, ex: MVC, Factory, etc)*
+* **Herança e Polimorfismo:** Criação de diferentes tipos de envios herdando de uma classe base de entrega.
 
 ## ⚙️ Como Executar o Projeto
 
