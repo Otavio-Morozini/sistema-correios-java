@@ -1,8 +1,8 @@
-import View.MenuConsole;
+import View.MenuGeral;
 
 public class Main {
     public static void main(String[] args) {
-        MenuConsole menu = new MenuConsole();
+        MenuGeral menu = new MenuGeral();
         menu.iniciar();
     }
 }

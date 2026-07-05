@@ -4,13 +4,15 @@ public class Entrega {
     private Funcionario funcionario;
     private Encomenda encomenda;
     private ModalidadeFrete modalidadeFrete;
+    private PrazoEntrega prazoEntrega;
     private StatusEntrega status;
 
 
-    public Entrega(Funcionario funcionario, Encomenda encomenda, ModalidadeFrete modalidadeFrete) {
+    public Entrega(Funcionario funcionario, Encomenda encomenda, ModalidadeFrete modalidadeFrete, PrazoEntrega prazoEntrega) {
         this.funcionario = funcionario;
         this.encomenda = encomenda;
         this.modalidadeFrete = modalidadeFrete;
+        this.prazoEntrega = prazoEntrega;
         this.status = StatusEntrega.PENDENTE;
     }
 
@@ -35,17 +37,26 @@ public class Entrega {
         this.modalidadeFrete = modalidadeFrete;
     }
 
+    public PrazoEntrega getPrazoEntrega() {
+        return prazoEntrega;
+    }
+    public void setPrazoEntrega(PrazoEntrega prazoEntrega) {
+        this.prazoEntrega = prazoEntrega;
+    }
+
     public double calcularTotalFrete(){
         return modalidadeFrete.calcularValor(encomenda.getPeso());
     }
 
+    @Override
     public String toString() {
         return "[ENTREGA - Status: " + this.status + "]\n" +
                 "Cliente: " + encomenda.getDestinatario().getNome() + " (CPF: " + encomenda.getDestinatario().getCpf() + ")\n" +
                 "Endereço: " + encomenda.getDestinatario().getEndereco().toString()+ "\n" +
                 "Encomenda: " + encomenda.getNome() + " | Peso: " + encomenda.getPeso() + "kg\n" +
                 "Entregador: " + funcionario.getNome() + " | Veículo: " + funcionario.getVeiculo().toString() + "\n" +
-                "Valor do Frete: R$ " + String.format("%.2f", calcularTotalFrete());
+                "Valor do Frete: R$ " + String.format("%.2f", calcularTotalFrete()) + "\n" +
+                "Prazo Estimado: " + prazoEntrega.obterDescricao();
     }
 
 }
